@@ -9,14 +9,15 @@ const signin = require('./controllers/signin')
 const profile = require('./controllers/profile')
 const image = require('./controllers/image')
 
-require('dotenv').config()
+const env = require('./config')
+
 
 const db = knex({
     client: 'pg',
     connection: {
         host: '127.0.0.1',
         user: 'postgres',
-        password: `${process.env.PASSWORD}`,
+        password: `${env.PASSWORD}`,
         database: 'smart-brain'
     }
 });
@@ -38,6 +39,7 @@ app.post('/register', register.handleRegister(db, bcrypt))
 app.get('/profile/:id', profile.handleProfileGet(db))
 
 app.put('/image', image.handleImage(db))
+app.post('/imageurl', image.handleApiCall)
 
 
 app.listen(3000, () => {
