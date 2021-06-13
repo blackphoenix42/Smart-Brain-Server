@@ -15,10 +15,8 @@ const env = require('./config')
 const db = knex({
     client: 'pg',
     connection: {
-        host: 'postgresql-parallel-40557',
-        user: 'postgres',
-        password: `${env.PASSWORD}`,
-        database: 'smart-brain'
+        host: process.env.DATABASE_URL,
+        ssl: true
     }
 });
 
