@@ -18,10 +18,6 @@ const db = require('knex')({
 
 const app = express()
 
-db.select('*').from('users').then(data => {
-    console.log(data)
-})
-
 app.use(bodyParser.json())
 app.use(cors())
 const database = {
@@ -71,23 +67,23 @@ app.post('/register', (req, res) => {
         .then(user => {
             res.json(user[0])
         })
-        .catch(err => res.staus(400).(json('unable to register')))
+        .catch(err => res.staus(400).json('unable to register'))
 
 
 })
 
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params
-    let found = false
-    database.users.forEach(user => {
-        if (user.id === id) {
-            found = true
-            return res.json(user)
-        }
-    })
-    if (!found) {
-        res.status(400).json('no such user')
-    }
+
+    db.select('*')
+        .from('users')
+        .where({ id })
+        .then(user => {
+            user.length ? res.json(user[0]) : res.status(400).json('Not Found')
+        })
+        .catch(err => {
+            res.status(400).json('Error Getting User')
+        })
 })
 
 app.put('/image', (req, res) => {
