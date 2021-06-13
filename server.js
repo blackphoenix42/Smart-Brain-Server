@@ -2,7 +2,25 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt-nodejs')
 const cors = require('cors')
+const { response } = require('express')
+
+require('dotenv').config()
+
+const db = require('knex')({
+    client: 'pg',
+    connection: {
+        host: '127.0.0.1',
+        user: 'postgres',
+        password: `${process.env.PASSWORD}`,
+        database: 'smart-brain'
+    }
+});
+
 const app = express()
+
+db.select('*').from('users').then(data => {
+    console.log(data)
+})
 
 app.use(bodyParser.json())
 app.use(cors())
@@ -33,10 +51,8 @@ app.get('/', (req, res) => {
 })
 
 app.post('/signin', (req, res) => {
-
-
     if (req.body.email === database.users[0].email && req.body.password === database.users[0].password) {
-        res.json('success')
+        res.json(database.users[0])
     } else {
         res.status(400).json('error logging in')
     }
@@ -45,19 +61,19 @@ app.post('/signin', (req, res) => {
 app.post('/register', (req, res) => {
     const { email, name, password } = req.body
 
-    bcrypt.hash(password, null, null, (err, hash) => {
-        console.log(hash)
-    })
-    database.users.push({
-        id: '125',
-        name,
-        email,
-        password,
-        entries: 0,
-        joined: new Date()
+    db('users')
+        .returning('*')
+        .insert({
+            email,
+            name,
+            joined: new Date()
+        })
+        .then(user => {
+            res.json(user[0])
+        })
+        .catch(err => res.staus(400).(json('unable to register')))
 
-    })
-    res.json(database.users[database.users.length - 1])
+
 })
 
 app.get('/profile/:id', (req, res) => {
