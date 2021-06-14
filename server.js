@@ -26,7 +26,7 @@ app.use(cors())
 
 
 app.get('/', (req, res) => {
-    res.send('it is working')
+    res.send('Check out the app: https://smart-brain-phoenix.herokuapp.com/ ')
 })
 
 app.post('/signin', signin.handleSignIn(db, bcrypt))
